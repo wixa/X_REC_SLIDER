@@ -32,6 +32,7 @@ length = 1300.0  # length of slider
 way = float((length / 2) * 200)
 rotate = 0
 acceleration = 722
+change = 0
 
 class MyWindowClass(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -96,11 +97,12 @@ class MyWindowClass(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         self.horizontalSlider_3.setEnabled(1)
         self.horizontalSlider_3.setValue(0)
         if self.radioButton_3.isChecked():
-            self.direct = 'd1d'
+            self.direct = 1
         else:
-            self.direct = 'd0d'
-        self.ser.write(self.direct)
-        self.direct = ''
+            self.direct = 0
+        self.ser.write('d'+self.direct+'d')
+        global change
+        change=0
 
 
     def INIT_CHANGE(self):
@@ -117,6 +119,9 @@ class MyWindowClass(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         self.horizontalSlider_2.setDisabled(1)
         self.lcdNumber_3.setDisabled(1)
         self.horizontalSlider_3.setDisabled(1)
+        global change
+        change=1
+        self.ser.write('c'+str(change)+'c')
 
 
     def START_RUN(self):
@@ -143,17 +148,17 @@ class MyWindowClass(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             rotate = int((angel * 6400) / 360)
         timerun = (self.lcdNumber_2.intValue() + (self.lcdNumber_3.intValue()) * 60) * 60
         if timerun >= 800:
-            stepmode = 'm1m'
+            stepmode = 1
             global way
             way16 = way * 16
             speed = float(way16 / timerun)
         else:
-            stepmode = 'm0m'
+            stepmode = 0
             speed = float(way / timerun)
         global acceleration
         timeaccel = float(speed / acceleration)
-        statusbarstring = ('s' + str(int(speed)) + 's') + (stepmode) + (self.direct) + ('r' + str(rotate) + 'r') + (
-            't' + str(timeaccel) + 't')+('a'+str(acceleration)+'a')
+        statusbarstring = ('s' + str(int(speed)) + 's') + ('m'+(stepmode)+'m')+('a'+str(acceleration)+'a')+ ('r' + str(rotate) + 'r') + (
+            't' + str(way) + 't')
         self.ser.write(statusbarstring)
         self.direct = ''
         self.stepmode = ''
@@ -189,7 +194,7 @@ class MyWindowClass(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         self.radioButton_10.setEnabled(1)
         self.CHANGE_INIT.hide()
         self.statusbar.showMessage(u'Выберите режим и направление езды затем нажмите "Перевезти каретку ..."', 0)
-        self.ser.write('STOP')
+        self.ser.write('t0t')
 
 app = QtGui.QApplication(sys.argv)
 window = MyWindowClass()
