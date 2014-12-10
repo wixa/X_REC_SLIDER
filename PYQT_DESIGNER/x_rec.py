@@ -39,8 +39,8 @@ class MyWindowClass(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
         super(MyWindowClass,self).__init__(parent)
         self.setupUi(self)
         self.showFullScreen()
-        ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=1)
-        ser.open()
+        self.ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=1)
+        self.ser.open()
         self.timer = QtCore.QTimer()
         self.CHANGE_INIT.hide()
         self.STOP_BUTTON.hide()
@@ -157,13 +157,8 @@ class MyWindowClass(QtGui.QMainWindow, main_window_ui.Ui_MainWindow):
             speed = float(way / timerun)
         global acceleration
         timeaccel = float(speed / acceleration)
-<<<<<<< HEAD
         statusbarstring = ('s' + str(int(speed)) + 's') + ('m'+(stepmode)+'m')+('a'+str(acceleration)+'a')+ ('r' + str(rotate) + 'r') + (
             't' + str(way) + 't')
-=======
-        statusbarstring = ('s' + str(int(speed)) + 's') + (stepmode) + (self.direct) + ('r' + str(rotate) + 'r') + (
-            't' + str(timeaccel) + 't')
->>>>>>> parent of 5de74a0... Добавил прошивку для ардуино
         self.ser.write(statusbarstring)
         self.direct = ''
         self.stepmode = ''
